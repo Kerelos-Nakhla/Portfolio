@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let nodes = [], mouseX = 0.5, mouseY = 0.5;
     let raf = 0, resizeTimer = 0, lastFrame = 0, lastTime = 0;
     let stopped = document.hidden;
-    const frameInterval = 1000 / 30;
+    const frameInterval = 1000 / 24;
     const isSmallScreen = window.matchMedia("(max-width: 700px)").matches;
 
     const getTheme = () => document.documentElement.dataset.theme === "light"
@@ -246,8 +246,16 @@ document.addEventListener("DOMContentLoaded", () => {
       raf = 0;
     }
     window.addEventListener("resize", () => {
+      // Browser zoom can fire many resize events; suspend canvas work until it settles.
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      canvas.style.visibility = "hidden";
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => { resize(); start(); }, 140);
+      resizeTimer = setTimeout(() => {
+        resize();
+        canvas.style.visibility = "";
+        start();
+      }, 260);
     }, { passive: true });
     window.addEventListener("pointermove", (event) => {
       mouseX = event.clientX / Math.max(window.innerWidth, 1);
