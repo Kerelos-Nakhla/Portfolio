@@ -3467,17 +3467,16 @@ nav a.active::after {
 .live-background {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   z-index: 0;
   pointer-events: none;
-  opacity: .72;
-  mix-blend-mode: screen;
+  opacity: .42;
+  /* Avoid full-viewport blend-mode compositing on every animation frame. */
 }
 
 [data-theme="light"] .live-background {
-  opacity: 0.85;
-  mix-blend-mode: normal;
+  opacity: 0.48;
 }
 
 .site-header,
