@@ -134,7 +134,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Lightweight animated background: capped resolution/FPS, fewer nodes, and no work in hidden tabs.
   (function initLiveBackground() {
     const canvas = document.getElementById("liveBackground");
+    // Keep the full-viewport animated canvas off small screens; it adds continuous compositing work during pinch zoom.
     if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(max-width: 700px)").matches) {
+      canvas.style.display = "none";
+      return;
+    }
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
@@ -246,11 +251,18 @@ document.addEventListener("DOMContentLoaded", () => {
       raf = 0;
     }
     window.addEventListener("resize", () => {
-      // Browser zoom fires rapid resize events; debounce canvas resizing without toggling visibility to prevent lag and flicker
+      // Pause expensive animation and visual effects while the browser is resizing or zooming.
+      document.documentElement.classList.add("is-resizing");
+      stopped = true;
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
         resize();
-      }, 150);
+        document.documentElement.classList.remove("is-resizing");
+        stopped = document.hidden;
+        if (!stopped) start();
+      }, 220);
     }, { passive: true });
     window.addEventListener("pointermove", (event) => {
       mouseX = event.clientX / Math.max(window.innerWidth, 1);
