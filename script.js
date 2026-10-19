@@ -246,16 +246,11 @@ document.addEventListener("DOMContentLoaded", () => {
       raf = 0;
     }
     window.addEventListener("resize", () => {
-      // Browser zoom can fire many resize events; suspend canvas work until it settles.
-      if (raf) cancelAnimationFrame(raf);
-      raf = 0;
-      canvas.style.visibility = "hidden";
+      // Browser zoom fires rapid resize events; debounce canvas resizing without toggling visibility to prevent lag and flicker
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
         resize();
-        canvas.style.visibility = "";
-        start();
-      }, 260);
+      }, 150);
     }, { passive: true });
     window.addEventListener("pointermove", (event) => {
       mouseX = event.clientX / Math.max(window.innerWidth, 1);
