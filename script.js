@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
-      metaTheme.content = isDark ? "#0b0f19" : "#f8fafc";
+      metaTheme.content = isDark ? "#1a1a2e" : "#f7fff7";
     }
   };
 
@@ -440,8 +440,130 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     }
+
+    // Auto-advancing slideshow — 4.5s, pauses on hover/focus
+    let autoTimer = null;
+
+    const startAuto = () => {
+      if (total <= 1) return;
+      autoTimer = setInterval(() => showSlide(current + 1), 4500);
+    };
+
+    const stopAuto = () => {
+      clearInterval(autoTimer);
+      autoTimer = null;
+    };
+
+    gallery.addEventListener("mouseenter", stopAuto);
+    gallery.addEventListener("mouseleave", startAuto);
+    gallery.addEventListener("focusin",    stopAuto);
+    gallery.addEventListener("focusout",   startAuto);
+
+    // Also stop on manual nav button click, restart after 8s
+    const resetAutoOnManual = () => {
+      stopAuto();
+      setTimeout(startAuto, 8000);
+    };
+
+    if (nextBtn) nextBtn.addEventListener("click", resetAutoOnManual);
+    if (prevBtn) prevBtn.addEventListener("click", resetAutoOnManual);
+
+    startAuto();
   });
 
   // Apply initial filtering state
   applyFiltering();
+
+  // 10. Video Demo Modal — 🎬 Dashboard Demo button handler
+  const videoDemoModal  = document.getElementById("videoDemoModal");
+  const videoModalClose = document.getElementById("videoModalCloseBtn");
+  const videoModalBack  = document.getElementById("videoModalBackdrop");
+  const modalPlayer     = document.getElementById("modalVideoPlayer");
+  const modalSrc        = document.getElementById("modalVideoSource");
+  const modalTitle      = document.getElementById("videoModalTitle");
+  const modalSub        = document.getElementById("videoModalSub");
+  const modalInteractive = document.getElementById("modalInteractivePreview");
+  const modalPreviewImg  = document.getElementById("modalPreviewImg");
+  const modalPreviewTitle = document.getElementById("modalPreviewTitle");
+  const modalPreviewDesc  = document.getElementById("modalPreviewDesc");
+  const modalRepoBtn      = document.getElementById("modalRepoBtn");
+
+  const openVideoModal = (btn) => {
+    if (!videoDemoModal) return;
+
+    const videoUrl   = btn.dataset.video   || "";
+    const fallback   = btn.dataset.fallback || "";
+    const projectName = btn.dataset.demoProject || "Dashboard Demo";
+    const lead        = btn.dataset.demoLead    || "";
+    const preview     = btn.dataset.preview     || "";
+    const repo        = btn.dataset.repo        || "#";
+
+    if (modalTitle) modalTitle.textContent = projectName;
+    if (modalSub)   modalSub.textContent   = lead;
+
+    if (videoUrl || fallback) {
+      // Show video player mode
+      if (modalPlayer) modalPlayer.style.display = "";
+      if (modalInteractive) modalInteractive.style.display = "none";
+
+      const src = videoUrl || fallback;
+      if (modalSrc) { modalSrc.src = src; }
+      if (modalPlayer) {
+        modalPlayer.load();
+        modalPlayer.play().catch(() => {});
+      }
+    } else {
+      // Show interactive preview mode (no video available)
+      if (modalPlayer) modalPlayer.style.display = "none";
+      if (modalInteractive) modalInteractive.style.display = "flex";
+      if (modalPreviewImg)  modalPreviewImg.src  = preview;
+      if (modalPreviewTitle) modalPreviewTitle.textContent = projectName;
+      if (modalPreviewDesc)  modalPreviewDesc.textContent  = lead || "Explore full case study and dimensional models on GitHub.";
+      if (modalRepoBtn)     modalRepoBtn.href    = repo;
+    }
+
+    videoDemoModal.classList.add("active");
+    videoDemoModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeVideoModal = () => {
+    if (!videoDemoModal) return;
+    videoDemoModal.classList.remove("active");
+    videoDemoModal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    if (modalPlayer) { modalPlayer.pause(); modalPlayer.currentTime = 0; }
+    if (modalSrc) modalSrc.src = "";
+  };
+
+  if (videoModalClose) videoModalClose.addEventListener("click", closeVideoModal);
+  if (videoModalBack)  videoModalBack.addEventListener("click",  closeVideoModal);
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && videoDemoModal?.classList.contains("active")) {
+      closeVideoModal();
+    }
+  });
+
+  // Wire up all "🎬 Dashboard Demo" buttons
+  document.querySelectorAll(".action-btn-demo").forEach((btn) => {
+    btn.addEventListener("click", () => openVideoModal(btn));
+  });
+
+  // 11. Scroll Reveal Observer
+  if ("IntersectionObserver" in window) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: "0px 0px -40px 0px" });
+
+    document.querySelectorAll(".reveal").forEach((el) => revealObserver.observe(el));
+  } else {
+    // Fallback: make all reveals visible immediately
+    document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-visible"));
+  }
 });
