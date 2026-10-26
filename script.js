@@ -446,7 +446,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const startAuto = () => {
       if (total <= 1) return;
-      autoTimer = setInterval(() => showSlide(current + 1), 4500);
+      autoTimer = setInterval(() => showSlide(current + 1), 6500);
     };
 
     const stopAuto = () => {
@@ -462,7 +462,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Also stop on manual nav button click, restart after 8s
     const resetAutoOnManual = () => {
       stopAuto();
-      setTimeout(startAuto, 8000);
+      setTimeout(startAuto, 10000);
     };
 
     if (nextBtn) nextBtn.addEventListener("click", resetAutoOnManual);
@@ -575,3 +575,177 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-visible"));
   }
 });
+
+  // ==========================================================================
+  // 12. Interactive Animated Particle & Constellation Background
+  // ==========================================================================
+  const initAnimatedBackground = () => {
+    const canvas = document.getElementById("bg-canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let width = 0;
+    let height = 0;
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let animationFrameId = null;
+    let mouse = { x: -1000, y: -1000, radius: 140 };
+
+    const resize = () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = width + "px";
+      canvas.style.height = height + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    resize();
+    window.addEventListener("resize", resize, { passive: true });
+
+    // Track mouse / touch for interactive disturbance
+    window.addEventListener("mousemove", (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    }, { passive: true });
+
+    window.addEventListener("mouseleave", () => {
+      mouse.x = -1000;
+      mouse.y = -1000;
+    }, { passive: true });
+
+    // Determine particle count based on screen width
+    const particleCount = width < 768 ? 28 : 55;
+    const particles = [];
+    const colors = ["#4ECDC4", "#FF6B6B", "#38bdf8", "#818cf8"];
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: (Math.random() - 0.5) * 0.45,
+        radius: Math.random() * 1.8 + 1.2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: Math.random() * 0.45 + 0.25,
+        baseAlpha: Math.random() * 0.45 + 0.25,
+      });
+    }
+
+    const maxDist = width < 768 ? 90 : 130;
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw subtle connecting lines (data constellation effect)
+      for (let i = 0; i < particles.length; i++) {
+        const p1 = particles[i];
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist < maxDist) {
+            const lineAlpha = (1 - dist / maxDist) * 0.12;
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(78, 205, 196, ${lineAlpha})`;
+            ctx.lineWidth = 0.75;
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Update & draw particles
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+
+        // Move
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Bounce on boundaries
+        if (p.x < 0) { p.x = 0; p.vx *= -1; }
+        else if (p.x > width) { p.x = width; p.vx *= -1; }
+        if (p.y < 0) { p.y = 0; p.vy *= -1; }
+        else if (p.y > height) { p.y = height; p.vy *= -1; }
+
+        // Mouse interactivity — particles push gently away from cursor
+        const mdx = p.x - mouse.x;
+        const mdy = p.y - mouse.y;
+        const mDist = Math.hypot(mdx, mdy);
+        if (mDist < mouse.radius && mDist > 0) {
+          const force = (1 - mDist / mouse.radius) * 1.5;
+          p.x += (mdx / mDist) * force;
+          p.y += (mdy / mDist) * force;
+          p.alpha = Math.min(1, p.baseAlpha + 0.35);
+        } else {
+          p.alpha = p.baseAlpha;
+        }
+
+        // Draw particle
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 6;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1.0;
+      }
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    // Pause when tab not visible to conserve battery & performance
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        animationFrameId = requestAnimationFrame(render);
+      }
+    });
+
+    // Check prefers-reduced-motion
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      render();
+    }
+  };
+
+  initAnimatedBackground();
+
+  // ==========================================================================
+  // 13. Interactive 3D Card Hover Tilt Effect
+  // ==========================================================================
+  const initCardTilt = () => {
+    // Only apply on non-touch devices with fine pointers
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const cards = document.querySelectorAll(".project-card, .cert-card, .cv-card, .kpi-metric-card");
+    cards.forEach((card) => {
+      card.addEventListener("mousemove", (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = ((y - centerY) / centerY) * -3.5;
+        const rotateY = ((x - centerX) / centerX) * 3.5;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-4px)`;
+      });
+
+      card.addEventListener("mouseleave", () => {
+        card.style.transform = "";
+      });
+    });
+  };
+
+  initCardTilt();
+

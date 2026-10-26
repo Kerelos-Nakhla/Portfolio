@@ -56,7 +56,8 @@
   <div class="scroll-progress" aria-hidden="true"></div>
 
   <!-- SITE HEADER -->
-  <header class="site-header">
+  <canvas id="bg-canvas" class="background-canvas" aria-hidden="true"></canvas>
+    <header class="site-header">
     <div class="header-inner">
       <a class="logo" href="#home" aria-label="Kerelos Nakhla Homepage">
         <span class="logo-mark" aria-hidden="true">
@@ -918,8 +919,11 @@
         <!-- PROJECT 08: Nestlé -->
         <article class="project-card reveal" data-project="nestle" data-category="powerbi">
           <div class="project-gallery-wrapper">
-            <div class="project-gallery" id="gallery-nestle" data-total="3" tabindex="0" role="region" aria-label="Nestlé Dashboard Gallery">
-              <div class="gallery-slide active" data-caption="Overview Dashboard — Page 1">
+            <div class="project-gallery" id="gallery-nestle" data-total="4" tabindex="0" role="region" aria-label="Nestlé Dashboard Gallery">
+              <div class="gallery-slide active" data-caption="Landing Page">
+                <img src="https://raw.githubusercontent.com/Kerelos-Nakhla/Nestle-Dashboard/main/Dashboard%20Previews/Landing%20Page.png" alt="Nestlé Sales Performance Analytics landing page" loading="lazy" decoding="async">
+              </div>
+              <div class="gallery-slide" data-caption="Overview Dashboard — Page 1">
                 <img src="https://raw.githubusercontent.com/Kerelos-Nakhla/Nestle-Dashboard/main/Dashboard%20Previews/1-%20Overview%20Page.png" alt="Nestlé sales dashboard overview, page 1" loading="lazy" decoding="async">
               </div>
               <div class="gallery-slide" data-caption="Overview Dashboard — Page 2">
@@ -930,7 +934,7 @@
               </div>
               <button class="gallery-nav-btn prev" aria-label="Previous dashboard preview" type="button">&#8249;</button>
               <button class="gallery-nav-btn next" aria-label="Next dashboard preview" type="button">&#8250;</button>
-              <div class="gallery-badge"><span class="current-idx">1</span> / 3 · <span class="current-caption">Overview Dashboard — Page 1</span></div>
+              <div class="gallery-badge"><span class="current-idx">1</span> / 4 · <span class="current-caption">Landing Page</span></div>
             </div>
           </div>
           <div class="project-number">08</div>
