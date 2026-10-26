@@ -2230,3 +2230,61 @@ main {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+
+
+/* Portfolio refinement: balanced teal/coral accents, clear project hierarchy, and polished motion */
+.site-nav {
+  gap: clamp(2px, .45vw, 8px);
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  box-shadow: var(--shadow-sm);
+}
+.nav-link {
+  padding: 9px 12px;
+  border-radius: var(--radius-full);
+  font-size: .86rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.nav-link::after { display: none; }
+.nav-link:hover, .nav-link.active {
+  color: var(--ink);
+  background: var(--accent-soft);
+}
+.nav-link:focus-visible { outline-offset: 1px; }
+.project-card {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+  padding: clamp(20px, 3vw, 34px);
+  overflow: hidden;
+}
+.project-gallery-wrapper { grid-row: 1; }
+.project-gallery { aspect-ratio: 16 / 8.4; }
+.project-info { grid-row: 2; gap: 0; }
+.project-number { top: auto; bottom: 22px; right: 26px; opacity: .45; }
+.project-card:hover .project-gallery img { transform: scale(1.015); }
+.gallery-slide img { transition: transform .55s cubic-bezier(.2,.7,.2,1); }
+.cert-thumb-wrapper { cursor: zoom-in; }
+.cert-thumb-wrapper:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.video-modal-screen iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; display: block; background: #111; }
+.site-header { box-shadow: 0 5px 24px rgba(26,26,46,.045); }
+.logo { transition: transform var(--transition-fast); }
+.logo:hover { transform: translateY(-1px); }
+.hero-chart-backdrop { animation: chart-drift 18s ease-in-out infinite alternate; }
+@keyframes chart-drift { from { transform: translate3d(0,0,0); } to { transform: translate3d(0,-8px,0); } }
+@media (max-width: 860px) {
+  .site-nav { border-radius: 0 0 20px 20px; border-inline: 0; border-top: 0; padding: 18px 22px 22px; gap: 6px; background: var(--surface); }
+  .nav-link { width: 100%; padding: 12px 14px; }
+}
+@media (max-width: 640px) {
+  .project-card { gap: 16px; padding: 16px; }
+  .project-gallery { aspect-ratio: 16 / 10; }
+  .project-number { top: 24px; bottom: auto; right: 24px; }
+  .site-nav { box-shadow: var(--shadow-lg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-chart-backdrop { animation: none; }
+  .gallery-slide img, .logo { transition: none; }
+}
