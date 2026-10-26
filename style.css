@@ -2196,3 +2196,37 @@ main {
   }
 }
 
+
+
+/* Final responsive and accessibility polish */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .header-inner { padding-inline: 16px; }
+  .site-nav { max-height: calc(100dvh - var(--header-height)); overflow-y: auto; }
+  .hero { padding-top: calc(var(--header-height) + 28px); }
+  .hero-title { font-size: clamp(2.35rem, 11vw, 3.6rem); line-height: 1.08; }
+  .hero-actions { display: grid; grid-template-columns: 1fr; width: min(100%, 360px); margin-inline: auto; }
+  .hero-actions .button { justify-content: center; min-height: 48px; }
+  .project-card { padding: 16px; gap: 18px; }
+  .project-gallery { min-height: 0; aspect-ratio: 16 / 10; }
+  .gallery-nav-btn { width: 40px; height: 40px; }
+  .gallery-badge { max-width: calc(100% - 24px); font-size: .72rem; }
+  .project-actions-bar { gap: 10px; }
+  .action-btn { min-height: 46px; justify-content: center; }
+  .mini-stats { grid-template-columns: 1fr; }
+  .cert-thumb-wrapper img { width: 100%; height: auto; object-fit: contain; }
+  .lightbox-body img { max-height: 68dvh; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .gallery-nav-btn { opacity: 1; }
+  .gallery-overlay { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
