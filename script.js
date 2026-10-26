@@ -479,6 +479,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const videoModalClose = document.getElementById("videoModalCloseBtn");
   const videoModalBack  = document.getElementById("videoModalBackdrop");
   const modalPlayer     = document.getElementById("modalVideoPlayer");
+  const modalDrivePlayer = document.getElementById("modalDrivePlayer");
   const modalSrc        = document.getElementById("modalVideoSource");
   const modalTitle      = document.getElementById("videoModalTitle");
   const modalSub        = document.getElementById("videoModalSub");
@@ -491,6 +492,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const openVideoModal = (btn) => {
     if (!videoDemoModal) return;
 
+    const driveEmbed = btn.dataset.driveEmbed || "";
     const videoUrl   = btn.dataset.video   || "";
     const fallback   = btn.dataset.fallback || "";
     const projectName = btn.dataset.demoProject || "Dashboard Demo";
@@ -501,8 +503,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (modalTitle) modalTitle.textContent = projectName;
     if (modalSub)   modalSub.textContent   = lead;
 
-    if (videoUrl || fallback) {
-      // Show video player mode
+    if (driveEmbed) {
+      if (modalPlayer) { modalPlayer.pause(); modalPlayer.style.display = "none"; }
+      if (modalInteractive) modalInteractive.style.display = "none";
+      if (modalDrivePlayer) { modalDrivePlayer.src = driveEmbed; modalDrivePlayer.style.display = "block"; }
+    } else if (videoUrl || fallback) {
+      if (modalDrivePlayer) { modalDrivePlayer.src = ""; modalDrivePlayer.style.display = "none"; }
       if (modalPlayer) modalPlayer.style.display = "";
       if (modalInteractive) modalInteractive.style.display = "none";
 
@@ -513,6 +519,7 @@ document.addEventListener("DOMContentLoaded", () => {
         modalPlayer.play().catch(() => {});
       }
     } else {
+      if (modalDrivePlayer) { modalDrivePlayer.src = ""; modalDrivePlayer.style.display = "none"; }
       // Show interactive preview mode (no video available)
       if (modalPlayer) modalPlayer.style.display = "none";
       if (modalInteractive) modalInteractive.style.display = "flex";
@@ -534,6 +541,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.style.overflow = "";
     if (modalPlayer) { modalPlayer.pause(); modalPlayer.currentTime = 0; }
     if (modalSrc) modalSrc.src = "";
+    if (modalDrivePlayer) { modalDrivePlayer.src = ""; modalDrivePlayer.style.display = "none"; }
   };
 
   if (videoModalClose) videoModalClose.addEventListener("click", closeVideoModal);
